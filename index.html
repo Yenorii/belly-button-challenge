@@ -54,12 +54,14 @@
 
     // Use the D3 library to read in samples.json
     d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json")
-      .then(function(data) {
-        console.log(data);
-      })
-      .catch(function(error) {
-       console.error("Error fetching data:", error);
-      });
+    .then(function(data) {
+      fetchedData = data; // Assign the fetched data to the global variable
+      console.log(fetchedData);
+      populateDropdown(); // Call the function to populate the dropdown after fetching data
+    })
+    .catch(function(error) {
+      console.error("Error fetching data:", error);
+    });
 
             
         // Creating a bar chart
