@@ -61,54 +61,31 @@
        console.error("Error fetching data:", error);
       });
 
-    // Create a horizontal bar chart w/ dropdown to display top 10 OTUs found in that individual
-    function populateDropdown() {
-      let dropdown = document.getElementById('selDataset');
-
-        // Loop through names and add to dropdown
-        data.names.forEach((name) => {
-         let option = document.createElement('option');
-          option.text = name;
-          option.value = name;
-          dropdown.appendChild(option);
-        });
-      }
+            
+        // Creating a bar chart
+        function createBarChart(selectedID) {
+          let selectedData = data.samples.find((sample) => sample.id === selectedID);
       
-    populateDropdown();
-
-    // Creating the chart
-    function createBarChart(selectedID) {
-      let selectedData = data.samples.find((sample) => sample.id === selectedID);
-
-      // Selecting only the top 10 OTUs
-      let otuIds = selectedData.otu_ids.slice(0, 10).reverse();
-      let sampleValues = selectedData.sample_values.slice(0, 10).reverse();
-      let otuLabels = selectedData.otu_labels.slice(0, 10).reverse();
-    
-      let trace = {
-        x: sampleValues,
-        y: otuIds.map(id => `OTU ${id}`), // Labels in the form "OTU ID"
-        text: otuLabels,
-        type: 'bar',
-        orientation: 'h'
-      };
-    
-      let layout = {
-        title: 'Top 10 OTUs for Selected Individual',
-        xaxis: { title: 'Sample Values' },
-        yaxis: { title: 'OTU IDs' }
-      };
-    
-      Plotly.newPlot('bar', [trace], layout);
-    }
-
-    document.getElementById('selDataset').addEventListener('change', function() {
-      let selectedID = this.value;
-      createBarChart(selectedID);
-
-});
-
-  </script>
+          // Selecting only the top 10 OTUs
+          let otuIds = selectedData.otu_ids.slice(0, 10).reverse();
+          let sampleValues = selectedData.sample_values.slice(0, 10).reverse();
+          let otuLabels = selectedData.otu_labels.slice(0, 10).reverse();
+      
+          // Setting up the bar chart
+          const chartContainer = d3.select('#bar');
+          const bars = chartContainer.selectAll('div').data(sampleValues);
+          bars.enter().append('div')
+            .style('width', d => `${d * 10}px`) 
+            .text((d, i) => `OTU ${otuIds[i]}: ${otuLabels[i]}`);
+        }
+      
+        document.getElementById('selDataset').addEventListener('change', function() {
+          let selectedID = this.value;
+          createBarChart(selectedID);
+        });
+      
+      </script>
+      
 
 </body>
 
