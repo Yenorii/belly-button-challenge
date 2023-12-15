@@ -56,14 +56,57 @@
     d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json")
       .then(function(data) {
         console.log(data);
-       })
+      })
       .catch(function(error) {
        console.error("Error fetching data:", error);
       });
 
-    // Create a horizontal bar chart with a dropdown menu to display the 
-    // top 10 OTUs found in that individual
+    // Create a horizontal bar chart w/ dropdown to display top 10 OTUs found in that individual
+    function populateDropdown() {
+      let dropdown = document.getElementById('selDataset');
+
+        // Loop through names and add to dropdown
+        data.names.forEach((name) => {
+         let option = document.createElement('option');
+          option.text = name;
+          option.value = name;
+          dropdown.appendChild(option);
+        });
+      }
+      
+    populateDropdown();
+
+    // Creating the chart
+    function createBarChart(selectedID) {
+      let selectedData = data.samples.find((sample) => sample.id === selectedID);
+
+      // Selecting only the top 10 OTUs
+      let otuIds = selectedData.otu_ids.slice(0, 10).reverse();
+      let sampleValues = selectedData.sample_values.slice(0, 10).reverse();
+      let otuLabels = selectedData.otu_labels.slice(0, 10).reverse();
     
+      let trace = {
+        x: sampleValues,
+        y: otuIds.map(id => `OTU ${id}`), // Labels in the form "OTU ID"
+        text: otuLabels,
+        type: 'bar',
+        orientation: 'h'
+      };
+    
+      let layout = {
+        title: 'Top 10 OTUs for Selected Individual',
+        xaxis: { title: 'Sample Values' },
+        yaxis: { title: 'OTU IDs' }
+      };
+    
+      Plotly.newPlot('bar', [trace], layout);
+    }
+
+    document.getElementById('selDataset').addEventListener('change', function() {
+      let selectedID = this.value;
+      createBarChart(selectedID);
+
+});
 
   </script>
 
