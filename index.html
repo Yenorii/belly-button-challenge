@@ -28,7 +28,7 @@
           <div class="panel-heading">
             <h3 class="panel-title">Demographic Info</h3>
           </div>
-          <div id="sample-metadata" class="panel-body"></div>
+          <div id="sample-metadata" class="panel-body" style="width: 600px"></div>
         </div>
       </div>
       <div class="col-md-5">
@@ -61,7 +61,7 @@ d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1
     data = responseData;
     fetchedData = data;
 
-// Creating the dropdown menu and charts
+// Creating the dropdown menu and creating a bar/bubble chart for each selection
 
         populateDropdown();
       })
@@ -81,12 +81,26 @@ d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1
         let selectedID = this.value;
         createBarChart(selectedID);
         createBubbleChart(selectedID);
+        displayMetadata(selectedID);
       });
 
       let defaultSubject = fetchedData.names[0];
       createBarChart(defaultSubject);
+
       createBubbleChart(defaultSubject);
+      displayMetadata(defaultSubject); 
     }
+
+// Displaying the sample metadata for selected ID under Demographic Info
+      function displayMetadata(selectedID) {
+        let metadata = fetchedData.metadata.find((item) => item.id === parseInt(selectedID));
+        let metadataPanel = d3.select("#sample-metadata");
+        metadataPanel.html("");
+      
+        Object.entries(metadata).forEach(([key, value]) => {
+          metadataPanel.append("p").text(`${key}: ${value}`);
+        });
+      }
 
  // Setting up the bar charts
 
@@ -102,12 +116,15 @@ d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1
             y: otuIds.map(id => `OTU ${id}`),
             text: otuLabels,
             type: 'bar',
-            orientation: 'h'
+            orientation: 'h'            
           };
+
           let layout = {
             xaxis: {},
-            yaxis: {}
+            yaxis: {},
+            width: 800
           };
+
           Plotly.newPlot('bar', [trace], layout);
         }
 
@@ -118,9 +135,11 @@ d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1
         console.error("Data not available.");
         return;
       }
+
       let selectedData = data.samples.find((sample) => sample.id === selectedID);
 
         console.log(selectedData);
+
         const bubbleData = [{
           x: selectedData.otu_ids,
           y: selectedData.sample_values,
@@ -132,11 +151,13 @@ d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1
             colorscale: 'Earth' 
           }
         }];
+
         const bubbleLayout = {
-          title: 'Bubble Chart for Each Sample',
           xaxis: { title: 'OTU ID' },
-          yaxis: { title: 'Sample Values' }
+          yaxis: {},
+          width: 1000
         };
+
         Plotly.newPlot('bubble', bubbleData, bubbleLayout);
       }
 
